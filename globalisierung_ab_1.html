@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Globalisierung & Arbeitsmarkt – Klassenarbeitsblatt</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:#f2f1ee;color:#1c1b18;font-size:15px}
+
+/* SCREENS */
+.screen{display:none;min-height:100vh}
+.screen.active{display:flex}
+#screen-setup{align-items:center;justify-content:center;background:#f2f1ee;padding:1rem}
+#screen-join{align-items:center;justify-content:center;background:#f2f1ee;padding:1rem}
+#screen-main{flex-direction:column;padding:0}
+
+/* SETUP CARD */
+.setup-card{background:#fff;border:1px solid #d4d1ca;border-radius:12px;padding:2rem;max-width:540px;width:100%;box-shadow:0 2px 20px #00000010}
+.setup-logo{font-size:2rem;margin-bottom:.8rem;text-align:center}
+.setup-title{font-size:1.2rem;font-weight:700;text-align:center;margin-bottom:.3rem}
+.setup-sub{font-size:.82rem;color:#999;text-align:center;line-height:1.6;margin-bottom:1.3rem}
+.steps{display:flex;flex-direction:column;gap:.55rem;margin-bottom:1.3rem}
+.step{display:flex;gap:.7rem;align-items:flex-start;font-size:.82rem;line-height:1.55;color:#444}
+.step-num{width:22px;height:22px;border-radius:50%;background:#1a4e8c;color:#fff;font-size:.72rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.05rem}
+.step a{color:#1a4e8c;font-weight:600}
+.step code{background:#f0eee8;border:1px solid #e0ddd6;border-radius:3px;padding:1px 5px;font-size:.78rem;font-family:monospace}
+.setup-sep{height:1px;background:#e8e6e2;margin:1rem 0}
+.input-label{font-size:.78rem;font-weight:600;color:#555;margin-bottom:.3rem;display:block}
+.setup-input{width:100%;padding:10px 13px;border:1.5px solid #d4d1ca;border-radius:7px;font-size:.85rem;font-family:monospace;outline:none;color:#1c1b18;background:#fafaf8;transition:border-color .15s}
+.setup-input:focus{border-color:#1a4e8c}
+.setup-btn{width:100%;margin-top:.7rem;padding:11px;background:#1a4e8c;color:#fff;border:none;border-radius:7px;font-size:.92rem;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.setup-btn:hover{opacity:.88}
+.setup-btn:disabled{opacity:.45;cursor:not-allowed}
+.setup-err{font-size:.78rem;color:#c42a1a;margin-top:.5rem;display:none;text-align:center}
+.setup-note{font-size:.74rem;color:#bbb;text-align:center;margin-top:.6rem;line-height:1.5}
+
+/* JOIN CARD */
+.join-card{background:#fff;border:1px solid #d4d1ca;border-radius:12px;padding:2.2rem 2rem;max-width:400px;width:100%;text-align:center;box-shadow:0 2px 20px #00000010}
+.join-logo{font-size:2rem;margin-bottom:.7rem}
+.join-title{font-size:1.2rem;font-weight:700;margin-bottom:.25rem}
+.join-sub{font-size:.82rem;color:#aaa;line-height:1.6;margin-bottom:1.3rem}
+.join-input{width:100%;padding:10px 13px;border:1.5px solid #d4d1ca;border-radius:7px;font-size:.93rem;font-family:inherit;outline:none;color:#1c1b18;background:#fafaf8;transition:border-color .15s}
+.join-input:focus{border-color:#1a4e8c}
+.join-btn{width:100%;margin-top:.65rem;padding:10px;background:#1a4e8c;color:#fff;border:none;border-radius:7px;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.join-btn:hover{opacity:.88}
+.join-btn:disabled{opacity:.45;cursor:not-allowed}
+.reset-link{font-size:.72rem;color:#bbb;margin-top:.7rem;cursor:pointer;text-decoration:underline;display:block}
+.reset-link:hover{color:#888}
+
+/* MAIN LAYOUT */
+.main-wrap{max-width:940px;margin:0 auto;padding:1.1rem 1rem 3rem;width:100%}
+.hdr{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:.5rem;border-bottom:2px solid #1c1b18;padding-bottom:.6rem;margin-bottom:1rem}
+.hdr h1{font-size:1.25rem;font-weight:700;letter-spacing:-.02em}
+.hdr p{font-size:.72rem;color:#bbb;font-style:italic;margin-top:.12rem}
+.badges{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.badge{padding:3px 10px;border-radius:20px;font-size:.69rem;font-weight:600}
+.b-blue{background:#eef4fb;color:#1a4e8c;border:1px solid #b5d4f4}
+.b-green{background:#edf7f1;color:#1a6e3c;border:1px solid #a8dfc0}
+.b-gray{background:#f0eee8;color:#666;border:1px solid #d0cdc6}
+.saved{font-size:.68rem;color:#bbb}
+.pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:#2a8c50;animation:pulse 2s infinite;margin-right:3px;vertical-align:middle}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;font-size:.74rem;font-family:inherit;font-weight:500;border:1px solid #d0cdc6;background:#fff;color:#444;border-radius:5px;cursor:pointer;transition:background .1s}
+.btn:hover{background:#ebe9e4}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.toolbar-note{font-size:.7rem;color:#bbb;margin-left:.2rem}
+
+/* TABS */
+.tabs{display:flex;gap:2px;margin-bottom:1rem;border-bottom:1px solid #d4d1ca;overflow-x:auto}
+.tab{padding:7px 13px;font-size:.77rem;font-weight:500;border:1px solid transparent;border-bottom:none;border-radius:5px 5px 0 0;cursor:pointer;color:#888;background:transparent;font-family:inherit;margin-bottom:-1px;white-space:nowrap}
+.tab.on{background:#fff;border-color:#d4d1ca;color:#1c1b18;font-weight:700}
+.tab:hover:not(.on){background:#ebe9e4;color:#444}
+.tab-panel{display:none}
+.tab-panel.on{display:block}
+
+/* INFO */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.7rem}
+.ic{background:#fff;border:1px solid #d4d1ca;border-radius:8px;overflow:hidden}
+.ic-hd{display:flex;align-items:center;gap:.6rem;padding:.6rem .85rem;border-bottom:1px solid #eee}
+.ic-emoji{width:30px;height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.05rem}
+.ic-title{font-size:.84rem;font-weight:700}
+.ic-body{padding:.65rem .85rem;font-size:.76rem;line-height:1.65;color:#444}
+.ic-body p{margin-bottom:.4rem}
+.bul{display:flex;gap:.35rem;margin-bottom:.28rem;align-items:flex-start;font-size:.76rem}
+.bul-arr{color:#ccc;flex-shrink:0}
+
+/* TASKS */
+.task-list{display:flex;flex-direction:column;gap:.6rem}
+.task{background:#fff;border:1px solid #d4d1ca;border-radius:8px;overflow:hidden}
+.task-hd{display:flex;align-items:flex-start;gap:.5rem;padding:.58rem .85rem;border-bottom:1px solid #f0eee8;background:#fafaf8}
+.tnum{width:22px;height:22px;border-radius:50%;background:#1c1b18;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0;margin-top:1px}
+.tq{font-size:.84rem;font-weight:700;line-height:1.35}
+.task-body{padding:.58rem .85rem}
+.hint{font-size:.7rem;color:#bbb;font-style:italic;margin-bottom:.38rem;line-height:1.4}
+.task-body textarea{width:100%;border:1px solid #d4d1ca;border-radius:5px;padding:7px 9px;font-size:.78rem;font-family:inherit;color:#1c1b18;background:#fafaf8;resize:vertical;min-height:66px;line-height:1.55;outline:none;transition:border-color .12s}
+.task-body textarea:focus{border-color:#1a4e8c}
+.task-body textarea::placeholder{color:#c8c4bc}
+.task-foot{background:#f8f7f4;padding:3px 8px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid #eee}
+.task-foot span{font-size:.67rem;color:#bbb}
+.dot{width:7px;height:7px;border-radius:50%;background:#d4d1ca;flex-shrink:0}
+.dot.ok{background:#2a8c50}
+
+/* KOMPS */
+.kcard{background:#fff;border:1px solid #d4d1ca;border-radius:8px;overflow:hidden;margin-bottom:.75rem}
+.kcard-hd{background:#fafaf8;padding:.45rem .85rem;border-bottom:1px solid #e8e6e2;font-size:.68rem;font-weight:700;color:#bbb;text-transform:uppercase;letter-spacing:.06em;display:flex;justify-content:space-between}
+.krow{display:flex;align-items:center;gap:.55rem;padding:.45rem .85rem;border-bottom:1px solid #f5f4f0}
+.krow:last-child{border-bottom:none}
+.klbl{font-size:.78rem;flex:1;color:#333}
+.kstars{display:flex;gap:2px}
+.kstar{width:26px;height:26px;border-radius:4px;border:1px solid #d4d1ca;cursor:pointer;font-size:.72rem;font-weight:600;display:flex;align-items:center;justify-content:center;color:#ccc;background:#fafaf8;user-select:none;transition:all .1s}
+.kstar.on{background:#1a4e8c;border-color:#1a4e8c;color:#fff}
+.kstar:hover:not(.on){background:#eef4fb;border-color:#b5d4f4;color:#1a4e8c}
+.hint-box{font-size:.74rem;color:#888;line-height:1.55;background:#fdf4e3;border:1px solid #f5d080;border-radius:6px;padding:.6rem .85rem}
+
+/* KLASSE */
+.s-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.55rem;margin-bottom:1rem}
+.s-card{background:#fff;border:1px solid #d4d1ca;border-radius:7px;padding:.65rem;text-align:center}
+.s-card.me{border:2px solid #1a4e8c}
+.s-av{width:32px;height:32px;border-radius:50%;background:#eef4fb;border:1.5px solid #b5d4f4;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:#1a4e8c;margin:0 auto .3rem}
+.s-av.me{background:#1a4e8c;color:#fff;border-color:#1a4e8c}
+.s-name{font-size:.76rem;font-weight:700}
+.s-prog{font-size:.66rem;color:#bbb;margin-top:.12rem}
+.s-bar{height:3px;background:#e8e6e2;border-radius:2px;margin-top:.3rem;overflow:hidden}
+.s-bar-fill{height:100%;background:#1a4e8c;border-radius:2px}
+.sec-hd{font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#bbb;margin:.85rem 0 .45rem;display:flex;align-items:center;gap:8px}
+.sec-hd::after{content:'';flex:1;height:1px;background:#d4d1ca}
+.ans-block{background:#fff;border:1px solid #d4d1ca;border-radius:7px;margin-bottom:.55rem;overflow:hidden}
+.ans-hd{padding:.42rem .85rem;background:#fafaf8;border-bottom:1px solid #eee;font-size:.76rem;font-weight:700;display:flex;align-items:center;gap:.45rem}
+.ans-cnt{font-size:.66rem;color:#bbb;margin-left:auto;flex-shrink:0}
+.ans-row{padding:.42rem .85rem;border-bottom:1px solid #f5f4f0;font-size:.76rem;display:flex;gap:.65rem;align-items:flex-start}
+.ans-row:last-child{border-bottom:none}
+.ans-who{min-width:78px;font-weight:600;color:#1a4e8c;font-size:.69rem;flex-shrink:0;padding-top:.05rem}
+.ans-txt{color:#444;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.empty-note{font-size:.72rem;color:#c8c4bc;font-style:italic;padding:.55rem .85rem}
+.kavg-row{display:flex;align-items:center;gap:.7rem;padding:.44rem .85rem;border-bottom:1px solid #f5f4f0}
+.kavg-row:last-child{border-bottom:none}
+.kavg-lbl{font-size:.77rem;flex:1;color:#333}
+.kavg-wrap{display:flex;align-items:center;gap:.4rem;min-width:120px}
+.kavg-bg{flex:1;height:7px;background:#e8e6e2;border-radius:4px;overflow:hidden}
+.kavg-fill{height:100%;background:#1a4e8c;border-radius:4px}
+.kavg-val{font-size:.71rem;font-weight:700;color:#1a4e8c;min-width:22px}
+.kavg-n{font-size:.66rem;color:#bbb;min-width:22px}
+
+/* FOOTER */
+.footer{border-top:1px solid #d4d1ca;margin-top:2rem;padding-top:.55rem;font-size:.66rem;color:#bbb;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.3rem}
+
+@media(max-width:560px){.info-grid{grid-template-columns:1fr}.hdr{flex-direction:column;align-items:flex-start}}
+@media print{.toolbar,.tabs,.tab,.task-foot,.kstar,.btn,.setup-card,.join-card{display:none!important}.tab-panel{display:block!important}}
+</style>
+</head>
+<body>
+
+<!-- ══ SETUP SCREEN ════════════════════════════════════════════ -->
+<div id="screen-setup" class="screen active">
+<div class="setup-card">
+  <div class="setup-logo">⚙️</div>
+  <div class="setup-title">Einmalige Einrichtung</div>
+  <div class="setup-sub">Für die Kollaboration wird eine kostenlose Firebase-Datenbank benötigt.<br>Einmalig einrichten — dauert ca. 5 Minuten.</div>
+
+  <div class="steps">
+    <div class="step"><span class="step-num">1</span><span>Gehe zu <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> und klicke auf <strong>„Projekt erstellen"</strong> (kostenloses Konto reicht).</span></div>
+    <div class="step"><span class="step-num">2</span><span>Im linken Menü: <strong>Erstellen → Realtime Database → Datenbank erstellen</strong>. Standort egal, Modus: <strong>„Im Testmodus starten"</strong>.</span></div>
+    <div class="step"><span class="step-num">3</span><span>Nach dem Erstellen siehst du oben eine URL, z.B. <code>https://mein-projekt-default-rtdb.europe-west1.firebasedatabase.app</code></span></div>
+    <div class="step"><span class="step-num">4</span><span>Kopiere diese URL und füge sie unten ein. Fertig — die Schüler-URL ist dann einfach diese HTML-Datei.</span></div>
+  </div>
+
+  <div class="setup-sep"></div>
+  <label class="input-label" for="db-url-input">Firebase Realtime Database URL</label>
+  <input class="setup-input" id="db-url-input" type="text"
+    placeholder="https://mein-projekt-rtdb.europe-west1.firebasedatabase.app">
+  <button class="setup-btn" id="setup-btn" onclick="doSetup()">Speichern &amp; starten</button>
+  <div class="setup-err" id="setup-err">Bitte eine gültige Firebase-URL eingeben (beginnt mit https://).</div>
+  <div class="setup-note">Die URL wird lokal in diesem Browser gespeichert.<br>Schüler sehen diesen Screen nicht — nur beim ersten Öffnen auf dem Lehrergerät.</div>
+</div>
+</div>
+
+<!-- ══ JOIN SCREEN ═════════════════════════════════════════════ -->
+<div id="screen-join" class="screen">
+<div class="join-card">
+  <div class="join-logo">🌍</div>
+  <div class="join-title">Globalisierung &amp; Arbeitsmarkt</div>
+  <div class="join-sub">Interaktives Klassenarbeitsblatt<br>Sozialwissenschaften/Wirtschaft · Klasse 9/10<br><br>Gib deinen Namen ein. Deine Antworten werden mit der Klasse geteilt.</div>
+  <input class="join-input" id="name-input" type="text" placeholder="Dein Name (z.B. Anna M.)" autocomplete="off">
+  <button class="join-btn" id="join-btn" onclick="doJoin()">Mitmachen →</button>
+  <span class="reset-link" onclick="resetSetup()">Lehrereinstellung ändern</span>
+</div>
+</div>
+
+<!-- ══ MAIN SCREEN ══════════════════════════════════════════════ -->
+<div id="screen-main" class="screen">
+<div class="main-wrap">
+
+  <div class="hdr">
+    <div><h1>Globalisierung &amp; Arbeitsmarkt</h1><p>Interaktives Klassenarbeitsblatt · Sozialwissenschaften/Wirtschaft</p></div>
+    <div class="badges">
+      <span class="badge b-blue" id="badge-name">–</span>
+      <span class="badge b-green"><span class="pulse"></span><span id="badge-active">0 aktiv</span></span>
+      <span class="badge b-gray" id="badge-prog">0/5 Aufgaben</span>
+      <span class="saved" id="badge-saved"></span>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn" id="refresh-btn" onclick="doPoll()">↻ Aktualisieren</button>
+    <button class="btn" onclick="window.print()">🖨 Drucken</button>
+    <span class="toolbar-note">Antworten speichern sich automatisch und sind für alle sichtbar.</span>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" onclick="switchTab('info')">Infomaterial</button>
+    <button class="tab"    onclick="switchTab('tasks')">Aufgaben</button>
+    <button class="tab"    onclick="switchTab('komp')">Kompetenz-Check</button>
+    <button class="tab"    onclick="switchTab('klasse')">Klassenansicht</button>
+  </div>
+
+  <div class="tab-panel on" id="tab-info"><div class="info-grid" id="info-cards"></div></div>
+  <div class="tab-panel"    id="tab-tasks"><div class="task-list" id="task-list"></div></div>
+  <div class="tab-panel"    id="tab-komp">
+    <div style="font-size:.8rem;color:#666;margin-bottom:.75rem;line-height:1.6;background:#fafaf8;border:1px solid #e8e6e2;border-radius:7px;padding:.6rem .85rem">
+      Bewerte deine Kompetenzen ehrlich: <strong>1 = gering</strong> bis <strong>5 = sehr gut</strong>. Der Klassendurchschnitt erscheint in der Klassenansicht.
+    </div>
+    <div class="kcard"><div class="kcard-hd"><span>Kompetenz</span><span>Selbsteinschätzung 1–5</span></div><div id="komp-rows"></div></div>
+    <div class="hint-box"><strong style="color:#8c4a00">Reflexion:</strong> Welche dieser Kompetenzen kannst du in der Schule, im Alltag oder in Praktika weiterentwickeln? Notiere deine Gedanken in Aufgabe 5.</div>
+  </div>
+  <div class="tab-panel" id="tab-klasse">
+    <div style="font-size:.78rem;color:#bbb;margin-bottom:.75rem;display:flex;align-items:center;gap:.45rem">
+      <span class="pulse"></span><span id="klasse-status">Lade Daten…</span>
+    </div>
+    <div class="s-grid" id="student-cards"></div>
+    <div class="sec-hd">Kompetenz-Klassendurchschnitt</div>
+    <div class="kcard" style="margin-bottom:1rem"><div id="kavg-rows"></div></div>
+    <div class="sec-hd">Alle Antworten nach Aufgabe</div>
+    <div id="all-answers"></div>
+  </div>
+
+  <div class="footer">
+    <span>Sozialwissenschaften/Wirtschaft · HRSGe · Klasse 9/10</span>
+    <span>Powered by Firebase Realtime Database</span>
+  </div>
+</div>
+</div>
+
+<script>
+// ══ CONTENT ═══════════════════════════════════════════════════
+const INFO=[
+  {e:"🌐",a:"#1a4e8c",bg:"#eef4fb",t:"Was ist Globalisierung?",
+   p:"Globalisierung bezeichnet den Prozess der weltweiten Vernetzung in Wirtschaft, Politik, Kultur und Gesellschaft. Nationale Grenzen verlieren an Bedeutung – Waren, Kapital, Informationen und Menschen bewegen sich zunehmend frei über Grenzen hinweg.",
+   b:["Weltweite Verflechtung von Märkten & Gesellschaften","Begriff des „globalen Dorfes" (Marshall McLuhan, 1960er)","Beschleunigung durch Internet & Digitalisierung seit den 1990er Jahren"]},
+  {e:"⚡",a:"#8c4a00",bg:"#fdf4e3",t:"Ursachen der Globalisierung",p:"",
+   b:["Technologischer Fortschritt – Internet, Containerschifffahrt, günstige Luftfahrt","Liberalisierung des Welthandels – WTO, EU-Binnenmarkt, Freihandelsabkommen","Digitalisierung – weltweite Datenkommunikation in Echtzeit","Kostengefälle – günstigere Produktion in Schwellen- und Entwicklungsländern","Politische Öffnung – Ende des Kalten Krieges, neue Märkte in Osteuropa & Asien"]},
+  {e:"🧠",a:"#1a6e3c",bg:"#edf7f1",t:"Kompetenzen im globalen Arbeitsmarkt",
+   p:"Globalisierung und KI verändern den Arbeitsmarkt grundlegend. Gefragt sind Fähigkeiten, die KI (noch) nicht ersetzen kann:",
+   b:["Digitale & KI-Kompetenz – KI bedienen, bewerten, einsetzen","Interkulturelle Kompetenz – weltweit mit Menschen zusammenarbeiten","Sprachkompetenz – v.a. Englisch als globale Geschäftssprache","Kreativität & kritisches Denken – komplexe Probleme lösen","Soziale Kompetenz & Empathie – was KI strukturell nicht leisten kann","Lernbereitschaft – lebenslanges Lernen in sich wandelnden Berufen"]},
+  {e:"📈",a:"#6b1a7a",bg:"#f7eef9",t:"KI & Globalisierung – Chancen & Risiken",
+   p:"KI verstärkt die Globalisierung und verändert gleichzeitig den Arbeitsmarkt tiefgreifend:",
+   b:["Chance: KI übernimmt Routineaufgaben → Fokus auf kreative, soziale Tätigkeiten","Chance: Auch Kleinunternehmen können global agieren (Plattformen, KI-Tools)","Risiko: Verlagerung von Arbeitsplätzen in Niedriglohnländer","Risiko: Automatisierung bedroht einfache, repetitive Tätigkeiten weltweit","Qualifikationslücke: Wer keine digitalen Kompetenzen hat, verliert im globalen Wettbewerb"]},
+];
+const TASKS=[
+  {id:1,q:"Was ist Globalisierung? Erkläre den Begriff in eigenen Worten.",hint:"Nutze die Infokarte 'Was ist Globalisierung?'. Nenne mindestens zwei Merkmale.",ph:"Globalisierung bedeutet…"},
+  {id:2,q:"Nenne und erkläre drei Ursachen der Globalisierung.",hint:"Denke an Technologie, Handel und Politik. Erkläre jede Ursache mit einem Satz.",ph:"1. [Ursache]: … weil …\n2. [Ursache]: … weil …\n3. [Ursache]: … weil …"},
+  {id:3,q:"Nenne je zwei Chancen und zwei Risiken der Globalisierung für Arbeitnehmer in Deutschland.",hint:"Denke sowohl an Industrie- als auch an Dienstleistungsberufe.",ph:"Chancen:\n1. …\n2. …\n\nRisiken:\n1. …\n2. …"},
+  {id:4,q:"Welche Berufe und Tätigkeiten werden durch KI und Globalisierung besonders bedroht? Welche sind sicherer? Begründe.",hint:"Überlege: Welche Tätigkeiten lassen sich automatisieren? Was kann KI (noch) nicht?",ph:"Bedrohte Tätigkeiten:\n• … weil …\n\nSicherere Tätigkeiten:\n• … weil …"},
+  {id:5,q:"Welche drei Kompetenzen sind deiner Meinung nach am wichtigsten für den globalen Arbeitsmarkt der Zukunft? Begründe.",hint:"Schau auf die Infokarte 'Kompetenzen' und deinen Kompetenz-Check. Was kann KI nicht?",ph:"1. [Kompetenz]: …, weil …\n2. [Kompetenz]: …, weil …\n3. [Kompetenz]: …, weil …"},
+];
+const KOMPS=[
+  {id:"digital", l:"Digitale Kompetenz (Computer, Software, Internet)"},
+  {id:"ki2",     l:"KI verstehen & einsetzen"},
+  {id:"kult",    l:"Interkulturelle Kompetenz"},
+  {id:"sprache", l:"Sprachkompetenz (Englisch und weitere Sprachen)"},
+  {id:"kreativ", l:"Kreativität & Innovation"},
+  {id:"sozial",  l:"Soziale Kompetenz & Empathie"},
+  {id:"analyse", l:"Kritisches Denken & Problemlösung"},
+  {id:"lern",    l:"Lernbereitschaft & Flexibilität"},
+];
+
+// ══ STATE ══════════════════════════════════════════════════════
+let DB="", myName="", mySlug="", myAnswers={}, myKomps={};
+let allStudents=[], allData={};
+const mkSlug=n=>n.trim().toLowerCase().replace(/[^a-z0-9]/g,"_").slice(0,22);
+const ini=n=>n.split(" ").map(w=>w[0]||"").join("").toUpperCase().slice(0,2)||"?";
+const esc=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+// ══ FIREBASE REST ══════════════════════════════════════════════
+const fb={
+  async get(path){
+    try{const r=await fetch(DB+path+".json");return r.ok?r.json():null;}catch{return null;}
+  },
+  async patch(path,data){
+    try{await fetch(DB+path+".json",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});}catch{}
+  },
+  async put(path,data){
+    try{await fetch(DB+path+".json",{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});}catch{}
+  }
+};
+
+// ══ SETUP ══════════════════════════════════════════════════════
+function show(id){["screen-setup","screen-join","screen-main"].forEach(s=>{
+  document.getElementById(s).classList.toggle("active",s===id);
+});}
+
+window.addEventListener("DOMContentLoaded",()=>{
+  const saved=localStorage.getItem("glob-firebase-url");
+  if(saved){DB=saved;show("screen-join");}
+  document.getElementById("name-input").addEventListener("keydown",e=>{if(e.key==="Enter")doJoin();});
+  document.getElementById("db-url-input").addEventListener("keydown",e=>{if(e.key==="Enter")doSetup();});
+});
+
+function doSetup(){
+  const url=document.getElementById("db-url-input").value.trim().replace(/\/$/,"");
+  const err=document.getElementById("setup-err");
+  if(!url.startsWith("https://")){err.style.display="block";return;}
+  err.style.display="none";
+  DB=url; localStorage.setItem("glob-firebase-url",DB);
+  show("screen-join");
+}
+function resetSetup(){localStorage.removeItem("glob-firebase-url");DB="";show("screen-setup");}
+
+// ══ JOIN ══════════════════════════════════════════════════════
+async function doJoin(){
+  const raw=document.getElementById("name-input").value.trim();
+  if(!raw)return;
+  const btn=document.getElementById("join-btn");
+  btn.disabled=true;btn.textContent="Bitte warten…";
+  myName=raw;mySlug=mkSlug(raw);
+
+  // Register
+  const existing=(await fb.get("/students/"+mySlug))||{};
+  await fb.patch("/students/"+mySlug,{name:myName,slug:mySlug,time:Date.now()});
+
+  // Load own data
+  myAnswers=(await fb.get("/answers/"+mySlug))||{};
+  myKomps=(await fb.get("/komps/"+mySlug))||{};
+
+  show("screen-main");
+  document.getElementById("badge-name").textContent=ini(myName)+" "+myName;
+
+  renderInfo();renderTasks();renderKompRows();updateProg();
+  doPoll();
+  setInterval(doPoll,9000);
+  setInterval(heartbeat,50000);
+}
+
+async function heartbeat(){
+  await fb.patch("/students/"+mySlug,{time:Date.now()});
+}
+
+// ══ POLL ══════════════════════════════════════════════════════
+async function doPoll(){
+  const btn=document.getElementById("refresh-btn");
+  btn.disabled=true;
+  const all=await fb.get("/students");
+  if(all){
+    allStudents=Object.values(all).filter(s=>Date.now()-s.time<60*60*1000);
+  } else {allStudents=[];}
+
+  const ad={};
+  for(const s of allStudents){
+    const a=await fb.get("/answers/"+s.slug);
+    const k=await fb.get("/komps/"+s.slug);
+    ad[s.slug]={name:s.name,answers:a||{},komps:k||{}};
+  }
+  allData=ad;
+
+  document.getElementById("badge-active").textContent=allStudents.length+" aktiv";
+  document.getElementById("klasse-status").textContent=
+    allStudents.length+" Schüler aktiv · automatische Aktualisierung alle 9 Sek.";
+
+  renderStudentCards();renderKavgRows();renderAllAnswers();
+  btn.disabled=false;
+}
+
+// ══ SAVE ══════════════════════════════════════════════════════
+const saveTimers={};
+function onInput(id,el){
+  const val=el.value,done=val.trim().length>20;
+  document.getElementById("tf-"+id).textContent=done?val.trim().length+" Zeichen":"Noch nicht beantwortet";
+  document.getElementById("td-"+id).className="dot"+(done?" ok":"");
+  myAnswers[id]=val;updateProg();
+  clearTimeout(saveTimers[id]);
+  saveTimers[id]=setTimeout(async()=>{
+    await fb.patch("/answers/"+mySlug,{[id]:val});
+    const now=new Date();
+    document.getElementById("badge-saved").textContent="✓ "+now.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"});
+  },700);
+}
+async function saveKomp(kid,val){
+  myKomps[kid]=val;
+  document.querySelectorAll('[data-kid="'+kid+'"] .kstar').forEach(s=>s.classList.toggle("on",+s.dataset.v<=val));
+  await fb.patch("/komps/"+mySlug,{[kid]:val});
+}
+function updateProg(){
+  const done=TASKS.filter(t=>(myAnswers[t.id]||"").trim().length>20).length;
+  document.getElementById("badge-prog").textContent=done+"/"+TASKS.length+" Aufgaben";
+}
+
+// ══ RENDER ════════════════════════════════════════════════════
+function renderInfo(){
+  document.getElementById("info-cards").innerHTML=INFO.map(c=>`
+    <div class="ic">
+      <div class="ic-hd">
+        <div class="ic-emoji" style="background:${c.bg};border:1px solid ${c.a}30">${c.e}</div>
+        <div class="ic-title" style="color:${c.a}">${c.t}</div>
+      </div>
+      <div class="ic-body">
+        ${c.p?`<p>${c.p}</p>`:""}
+        ${c.b.map(b=>`<div class="bul"><span class="bul-arr">→</span><span>${b}</span></div>`).join("")}
+      </div>
+    </div>`).join("");
+}
+
+function renderTasks(){
+  document.getElementById("task-list").innerHTML=TASKS.map(t=>{
+    const val=myAnswers[t.id]||"",done=val.trim().length>20;
+    return`<div class="task">
+      <div class="task-hd"><div class="tnum">${t.id}</div><div class="tq">${t.q}</div></div>
+      <div class="task-body">
+        <div class="hint">${t.hint}</div>
+        <textarea id="ta-${t.id}" rows="3" placeholder="${t.ph}"
+          oninput="onInput(${t.id},this)">${esc(val)}</textarea>
+      </div>
+      <div class="task-foot">
+        <span id="tf-${t.id}">${done?val.trim().length+" Zeichen":"Noch nicht beantwortet"}</span>
+        <div class="dot${done?" ok":""}" id="td-${t.id}"></div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderKompRows(){
+  document.getElementById("komp-rows").innerHTML=KOMPS.map(k=>`
+    <div class="krow" data-kid="${k.id}">
+      <div class="klbl">${k.l}</div>
+      <div class="kstars">${[1,2,3,4,5].map(n=>`
+        <div class="kstar${(myKomps[k.id]||0)>=n?" on":""}" data-v="${n}"
+          onclick="saveKomp('${k.id}',${n})">${n}</div>`).join("")}
+      </div>
+    </div>`).join("");
+}
+
+function renderStudentCards(){
+  const el=document.getElementById("student-cards");
+  if(!allStudents.length){el.innerHTML=`<p style="font-size:.8rem;color:#bbb;font-style:italic">Noch keine Schüler aktiv.</p>`;return;}
+  el.innerHTML=allStudents.map(s=>{
+    const sd=allData[s.slug]||{};
+    const cnt=TASKS.filter(t=>(sd.answers?.[t.id]||"").trim().length>20).length;
+    const me=s.slug===mySlug;
+    return`<div class="s-card${me?" me":""}">
+      <div class="s-av${me?" me":""}">${ini(s.name)}</div>
+      <div class="s-name">${s.name}${me?" (du)":""}</div>
+      <div class="s-prog">${cnt}/${TASKS.length} Aufgaben</div>
+      <div class="s-bar"><div class="s-bar-fill" style="width:${Math.round(cnt/TASKS.length*100)}%"></div></div>
+    </div>`;
+  }).join("");
+}
+
+function renderKavgRows(){
+  document.getElementById("kavg-rows").innerHTML=KOMPS.map(k=>{
+    const vals=Object.values(allData).map(d=>d.komps?.[k.id]||0).filter(v=>v>0);
+    const avg=vals.length?Math.round(vals.reduce((a,b)=>a+b,0)/vals.length*10)/10:null;
+    return`<div class="kavg-row">
+      <div class="kavg-lbl">${k.l}</div>
+      <div class="kavg-wrap">
+        <div class="kavg-bg"><div class="kavg-fill" style="width:${avg?Math.round(avg/5*100):0}%"></div></div>
+        <span class="kavg-val">${avg??"-"}</span>
+        <span class="kavg-n">(${vals.length})</span>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderAllAnswers(){
+  document.getElementById("all-answers").innerHTML=TASKS.map(t=>{
+    const entries=Object.values(allData).filter(d=>(d.answers?.[t.id]||"").trim().length>10);
+    return`<div class="ans-block">
+      <div class="ans-hd">
+        <div class="tnum" style="width:19px;height:19px;font-size:.67rem;border-radius:50%;background:#1c1b18;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0">${t.id}</div>
+        <span style="flex:1">${t.q}</span>
+        <span class="ans-cnt">${entries.length} Antw.</span>
+      </div>
+      ${entries.length===0
+        ?`<div class="empty-note">Noch keine Antworten.</div>`
+        :entries.map(d=>`<div class="ans-row">
+            <span class="ans-who">${d.name}</span>
+            <span class="ans-txt">${esc(d.answers[t.id])}</span>
+          </div>`).join("")}
+    </div>`;
+  }).join("");
+}
+
+function switchTab(id){
+  document.querySelectorAll(".tab").forEach((t,i)=>{
+    t.classList.toggle("on",["info","tasks","komp","klasse"][i]===id);
+  });
+  document.querySelectorAll(".tab-panel").forEach(p=>{
+    p.classList.toggle("on",p.id==="tab-"+id);
+  });
+  if(id==="klasse")doPoll();
+}
+</script>
+</body>
+</html>
